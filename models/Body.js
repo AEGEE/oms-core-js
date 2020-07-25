@@ -18,9 +18,9 @@ const Body = sequelize.define('body', {
         }
     },
     task_description: {
-      type: Sequelize.TEXT,
-      allowNull: true,
-      defaultValue: ''
+        type: Sequelize.TEXT,
+        allowNull: true,
+        defaultValue: ''
     },
     code: {
         type: Sequelize.STRING,
