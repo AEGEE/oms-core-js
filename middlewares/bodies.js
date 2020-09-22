@@ -4,7 +4,6 @@ const constants = require('../lib/constants');
 const errors = require('../lib/errors');
 const { sequelize } = require('../lib/sequelize');
 
-
 exports.listAllBodies = async (req, res) => {
     const result = await Body.findAndCountAll({
         where: {
