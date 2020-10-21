@@ -45,8 +45,6 @@ describe('Users list', () => {
             headers: { 'X-Auth-Token': token.value }
         });
 
-        console.log(res.body);
-
         expect(res.statusCode).toEqual(200);
         expect(res.body.success).toEqual(true);
         expect(res.body).toHaveProperty('data');
