@@ -115,8 +115,8 @@ exports.setUserActive = async (req, res) => {
 };
 
 exports.confirmUser = async (req, res) => {
-    if (!req.permissions.hasPermission('confirm:member')) {
-        return errors.makeForbiddenError(res, 'Permission confirm:member is required, but not present.');
+    if (!req.permissions.hasPermission('global:confirm:member')) {
+        return errors.makeForbiddenError(res, 'Permission global:confirm:member is required, but not present.');
     }
 
     await req.currentUser.update({ mail_confirmed_at: new Date() });

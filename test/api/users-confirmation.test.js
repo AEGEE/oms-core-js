@@ -37,7 +37,7 @@ describe('User confirmation', () => {
         const user = await generator.createUser({ superadmin: true });
         const token = await generator.createAccessToken({}, user);
 
-        await generator.createPermission({ scope: 'local', action: 'confirm', object: 'member' });
+        await generator.createPermission({ scope: 'global', action: 'confirm', object: 'member' });
 
         const res = await request({
             uri: '/members/' + user.id + '/confirm',
