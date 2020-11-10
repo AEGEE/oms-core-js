@@ -7,7 +7,7 @@ jobs:
       image: ubuntu-2004:202010-01
     steps:
       - checkout
-      - run: docker run --name postgres -p 5432:5432 -d postgres:10.6
+      - run: docker run --name postgres -p 5432:5432 -d postgres:latest
       - run:
           name: Install Node
           command: |
