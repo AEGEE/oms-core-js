@@ -7,7 +7,7 @@ jobs:
       image: ubuntu-2004:202010-01
     steps:
       - checkout
-      - run: docker run --name postgres-core -e POSTGRES_PASSWORD=${PW_POSTGRES} -p 5432:5432 -d postgres:latest
+      - run: docker run --name postgres -e POSTGRES_PASSWORD='5ecr3t' -p 5432:5432 -d postgres:latest
       - run:
           name: Install Node
           command: |
