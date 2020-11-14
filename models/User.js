@@ -132,7 +132,7 @@ const User = sequelize.define('user', {
         defaultValue: ''
     },
     primary_email: {
-        type: Sequelize.ENUM('personal','gsuite'),
+        type: Sequelize.ENUM('personal', 'gsuite'),
         allowNull: false,
         defaultValue: 'personal'
     },

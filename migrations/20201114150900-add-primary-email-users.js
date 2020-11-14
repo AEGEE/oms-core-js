@@ -3,7 +3,7 @@ module.exports = {
         'users',
         'primary_email',
         {
-            type: Sequelize.ENUM('personal','gsuite'),
+            type: Sequelize.ENUM('personal', 'gsuite'),
             allowNull: false,
             defaultValue: 'personal'
         },
