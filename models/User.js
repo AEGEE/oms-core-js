@@ -131,6 +131,11 @@ const User = sequelize.define('user', {
         allowNull: true,
         defaultValue: ''
     },
+    primary_email: {
+        type: Sequelize.ENUM('personal','gsuite'),
+        allowNull: false,
+        defaultValue: 'personal'
+    },
     last_logged_in: {
         type: Sequelize.DATE,
         allowNull: true
