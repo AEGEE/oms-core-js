@@ -138,6 +138,14 @@ const User = sequelize.define('user', {
     last_active: {
         type: Sequelize.DATE,
         allowNull: true
+    },
+    gsuite_id: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      validate: {
+          isEmail: { msg: 'Email should be valid.' }
+      },
+      unique: true
     }
 }, {
     underscored: true,
