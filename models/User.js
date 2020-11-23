@@ -142,7 +142,7 @@ const User = sequelize.define('user', {
             if (this.primary_email === 'gsuite') {
                 return this.gsuite_id;
             }
-            return this.primary_email;
+            return this.email;
         }
     },
     last_logged_in: {
