@@ -113,8 +113,9 @@ const Body = sequelize.define('body', {
 Body.beforeValidate(async (body) => {
     // skipping these fields if they are unset, will catch it later.
     if (typeof body.code === 'string') body.code = body.code.toUpperCase().trim();
-    if (typeof body.abbreviation === 'string') body.abbreviation = body.abbreviation.toLowerCase().trim();
     if (typeof body.email === 'string') body.email = body.email.toLowerCase().trim();
+
+    if (typeof body.abbreviation === 'string') body.abbreviation = body.abbreviation.trim();
 });
 
 module.exports = Body;
