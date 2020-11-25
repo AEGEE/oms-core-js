@@ -53,7 +53,6 @@ exports.createBody = async (req, res) => {
     }
 
     // TODO: if antenna, contact antenna or contact, then create GSuite account
-    // TODO: else create GSuite group. use the new abbreviation field for this (if possible), otherwise use the name
 
     // TODO: filter out fields that are changed in the other way
     const body = await Body.create(req.body);
