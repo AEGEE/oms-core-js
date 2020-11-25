@@ -57,6 +57,8 @@ exports.createMembership = async (req, res) => {
         user_id: user.id
     });
 
+    // TODO: check if user got the permission for an active GSuite account, if true activate user
+
     return res.json({
         success: true,
         data: circleMembership
@@ -93,6 +95,8 @@ exports.deleteMembership = async (req, res) => {
 
     await req.currentCircleMembership.destroy();
 
+    // TODO: check if user still has the permission for an active GSuite account, otherwise suspend GSuite account
+
     return res.json({
         success: true,
         message: 'Membership is deleted.'
@@ -109,6 +113,8 @@ exports.deleteOwnMembership = async (req, res) => {
     }
 
     await circleMembership.destroy();
+
+    // TODO: check if user still has the permission for an active GSuite account, otherwise suspend GSuite account
 
     return res.json({
         success: true,

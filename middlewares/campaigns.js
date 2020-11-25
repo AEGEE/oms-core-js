@@ -1,3 +1,5 @@
+const superagent = require('superagent');
+const crypto = require('crypto');
 const {
     User,
     MailConfirmation,
@@ -8,8 +10,6 @@ const errors = require('../lib/errors');
 const helpers = require('../lib/helpers');
 const constants = require('../lib/constants');
 const { sequelize } = require('../lib/sequelize');
-const superagent = require('superagent');
-const crypto = require('crypto');
 const mailer = require('../lib/mailer');
 
 exports.registerUser = async (req, res) => {
@@ -35,19 +35,19 @@ exports.registerUser = async (req, res) => {
             transaction: t
         });
 
-        // TODO: add duplicate name checking; translit gsuite_email in case of umlauts
-        const gsuite_email = req.body.first_name+'.'+req.body.last_name+'@aegee.eu'
+        // TODO: add uniqueness check; transliterate gsuiteEmail in case of umlauts or other special characters
+        const gsuiteEmail = req.body.first_name + '.' + req.body.last_name + '@' + constants.GSUITE_DOMAIN;
         const payload = {
-            'primaryEmail': gsuite_email.toLowerCase().replace(' ',''),
-            'name': {
-              'givenName':  req.body.first_name,
-              'familyName': req.body.last_name
+            primaryEmail: gsuiteEmail.toLowerCase().replace(' ', ''),
+            name: {
+                givenName: req.body.first_name,
+                familyName: req.body.last_name
             },
-            'secondaryEmail': req.body.email,
-            'password': crypto.createHash('sha1').update(JSON.stringify(req.body.password)).digest('hex'),
-            'userPK': req.body.username,
-            'antenna': 'Undefined-yet'
-        }
+            secondaryEmail: req.body.email,
+            password: crypto.createHash('sha1').update(JSON.stringify(req.body.password)).digest('hex'),
+            userPK: req.body.username,
+            antenna: 'Undefined-yet'
+        };
 
         // Adding a person to a body if campaign has the autojoin body.
         if (campaign.autojoin_body_id) {
