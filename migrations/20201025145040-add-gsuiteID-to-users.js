@@ -1,13 +1,12 @@
 module.exports = {
-    up: (queryInterface, Sequelize) =>
-      queryInterface.addColumn(
+    up: (queryInterface, Sequelize) => queryInterface.addColumn(
         'users',
         'gsuite_id',
         {
             type: Sequelize.STRING,
             allowNull: true,
-            //unique: true
+            unique: true
         },
-      ) ,
-    down: (queryInterface) =>  queryInterface.removeColumn('users', 'gsuite_id')
+    ),
+    down: (queryInterface) => queryInterface.removeColumn('users', 'gsuite_id')
 };

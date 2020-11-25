@@ -1,6 +1,6 @@
 module.exports = {
     up: (queryInterface, Sequelize) => queryInterface.addColumn(
-        'circles',
+        'bodies',
         'gsuite_id',
         {
             type: Sequelize.STRING,
@@ -8,5 +8,5 @@ module.exports = {
             unique: true
         },
     ),
-    down: (queryInterface) => queryInterface.removeColumn('circles', 'gsuite_id')
+    down: (queryInterface) => queryInterface.removeColumn('bodies', 'gsuite_id')
 };

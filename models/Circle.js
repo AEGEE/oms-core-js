@@ -20,10 +20,11 @@ const Circle = sequelize.define('circle', {
     gsuite_id: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: '',
         validate: {
-            isEmail: { msg: 'Email should be valid.' }
+            isEmail: { msg: 'GSuite ID should be a valid email.' }
+            // TODO: build custom validation that checks uniqueness for body and user as well
         },
+        unique: true
     }
 }, {
     underscored: true,
@@ -34,6 +35,8 @@ const Circle = sequelize.define('circle', {
 
 Circle.beforeValidate(async (circle) => {
     // skipping these fields if they are unset, will catch it later.
+    if (typeof circle.gsuite_id === 'string') circle.gsuite_id = circle.gsuite_id.toLowerCase().trim();
+
     if (typeof circle.name === 'string') circle.name = circle.name.trim();
     if (typeof circle.description === 'string') circle.description = circle.description.trim();
 });
