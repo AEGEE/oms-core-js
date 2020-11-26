@@ -4,6 +4,36 @@ const helpers = require('../lib/helpers');
 const constants = require('../lib/constants');
 const { Sequelize, sequelize } = require('../lib/sequelize');
 
+/**
+ * @swagger
+ *
+ * /circles:
+ *   post:
+ *     tags:
+ *       - "Circles"
+ *     summary: "Create Circle"
+ *     description: "This endpoint is to create a Circle group"
+ *     operationId: "createGroup"
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: "data"
+ *         in: "body"
+ *         description: "The data containing information on the group"
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/Group'
+ *     responses:
+ *       201:
+ *         description: "Successful operation"
+ *       400:
+ *         description: "Invalid input"
+ *       409:
+ *         description: "Duplicate entity"
+ */
+
 exports.listAllCircles = async (req, res) => {
     const where = helpers.filterBy(req.query.query, constants.FIELDS_TO_QUERY.CIRCLE);
 

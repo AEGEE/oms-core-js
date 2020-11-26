@@ -4,6 +4,24 @@ const constants = require('../lib/constants');
 const errors = require('../lib/errors');
 const { sequelize } = require('../lib/sequelize');
 
+/**
+ * @swagger
+ *
+ * /bodies:
+ *   get:
+ *     tags:
+ *       - "Bodies"
+ *     summary: "List all bodies"
+ *     description: "This endpoint is to list all bodies"
+ *     operationId: "listAllBodies"
+ *     produces:
+ *       - "application/json"
+ *     responses:
+ *       200:
+ *         description: "Successful operation"
+ *       403:
+ *         description: "Not enough permissions"
+ */
 exports.listAllBodies = async (req, res) => {
     if (req.query.all) {
         if (!req.user) {
@@ -40,6 +58,24 @@ exports.listAllBodies = async (req, res) => {
     });
 };
 
+/**
+ * @swagger
+ *
+ * /bodies/{body_id}:
+ *   get:
+ *     tags:
+ *       - "Bodies"
+ *     summary: "List specific body"
+ *     description: "This endpoint is to list specified body"
+ *     operationId: "listBody"
+ *     produces:
+ *       - "application/json"
+ *     responses:
+ *       200:
+ *         description: "Successful operation"
+ *       403:
+ *         description: "Not enough permissions"
+ */
 exports.getBody = async (req, res) => {
     return res.json({
         success: true,
@@ -47,6 +83,35 @@ exports.getBody = async (req, res) => {
     });
 };
 
+/**
+ * @swagger
+ *
+ * /bodies:
+ *   post:
+ *     tags:
+ *       - "Bodies"
+ *     summary: "Create bodies"
+ *     description: "This endpoint is to create bodies"
+ *     operationId: "createBody"
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: "body"
+ *         in: "body"
+ *         description: "The data containing information on the new body"
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/Body'
+ *     responses:
+ *       201:
+ *         description: "Successful operation"
+ *       400:
+ *         description: "Invalid input"
+ *       409:
+ *         description: "Duplicate entity"
+ */
 exports.createBody = async (req, res) => {
     if (!req.permissions.hasPermission('global:create:body')) {
         return errors.makeForbiddenError(res, 'Permission global:create:body is required, but not present.');
@@ -60,6 +125,35 @@ exports.createBody = async (req, res) => {
     });
 };
 
+/**
+ * @swagger
+ *
+ * /bodies/{body_id}:
+ *   put:
+ *     tags:
+ *       - "Bodies"
+ *     summary: "Update bodies"
+ *     description: "This endpoint is to update bodies"
+ *     operationId: "updateBody"
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: "body"
+ *         in: "body"
+ *         description: "The data containing information on the new body"
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/Body'
+ *     responses:
+ *       200:
+ *         description: "Successful operation"
+ *       400:
+ *         description: "Invalid input"
+ *       409:
+ *         description: "Duplicate entity"
+ */
 exports.updateBody = async (req, res) => {
     if (!req.permissions.hasPermission('update:body')) {
         return errors.makeForbiddenError(res, 'Permission update:body is required, but not present.');
@@ -72,6 +166,35 @@ exports.updateBody = async (req, res) => {
     });
 };
 
+/**
+ * @swagger
+ *
+ * /bodies/{body_id}/status:
+ *   put:
+ *     tags:
+ *       - "Bodies"
+ *     summary: "Update bodies' status"
+ *     description: "This endpoint is to update bodies' status"
+ *     operationId: "updateBodyStatus"
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: "body"
+ *         in: "body"
+ *         description: "The data containing information on the new body"
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/Body'
+ *     responses:
+ *       200:
+ *         description: "Successful operation"
+ *       400:
+ *         description: "Invalid input"
+ *       403:
+ *         description: "Unauthorised"
+ */
 exports.setBodyStatus = async (req, res) => {
     if (!req.permissions.hasPermission('global:delete:body')) {
         return errors.makeForbiddenError(res, 'Permission global:delete:body is required, but not present.');
@@ -97,6 +220,35 @@ exports.setBodyStatus = async (req, res) => {
     });
 };
 
+/**
+ * @swagger
+ *
+ * /bodies/{body_id}/members:
+ *   put:
+ *     tags:
+ *       - "Bodies"
+ *     summary: "Add body member"
+ *     description: "This endpoint is to add body member"
+ *     operationId: "addBodyMember"
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: "body"
+ *         in: "body"
+ *         description: "The data containing information on the new body"
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/Body'
+ *     responses:
+ *       200:
+ *         description: "Successful operation"
+ *       400:
+ *         description: "Invalid input"
+ *       403:
+ *         description: "Unauthorised"
+ */
 exports.createMember = async (req, res) => {
     if (!req.permissions.hasPermission('create_member:body')) {
         return errors.makeForbiddenError(res, 'Permission create_member:body is required, but not present.');
