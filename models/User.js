@@ -144,7 +144,6 @@ const User = sequelize.define('user', {
         allowNull: true,
         validate: {
             isEmail: { msg: 'GSuite ID should be a valid email.' }
-            // TODO: build custom validation that checks uniqueness for body and circle as well
         },
         unique: true
     }
