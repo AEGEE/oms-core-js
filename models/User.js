@@ -1,14 +1,14 @@
 const bcrypt = require('bcrypt');
 const moment = require('moment');
 
+const constants = require('../lib/constants');
 const { Sequelize, sequelize } = require('../lib/sequelize');
 const config = require('../config');
 
-const RESTRICTED_EMAILS = ['aegee.org', 'aegee.eu'];
 const NAME_REGEX = new RegExp('^[\\p{L}. \\-\']*$', 'u');
 const USERNAME_REGEX = new RegExp('^[a-zA-Z0-9._-]*$');
 // eslint-disable-next-line no-useless-escape
-const EMAIL_REGEX = new RegExp('\@(' + RESTRICTED_EMAILS.join('|').trim() + ')');
+const EMAIL_REGEX = new RegExp('\@(' + constants.RESTRICTED_EMAILS.join('|').trim() + ')');
 
 const User = sequelize.define('user', {
     username: {
@@ -34,7 +34,7 @@ const User = sequelize.define('user', {
             isEmail: { msg: 'Email should be valid.' },
             isValid(value) {
                 if (EMAIL_REGEX.test(value)) {
-                    throw new Error('Email can not be in one of the following domains: ' + RESTRICTED_EMAILS.join(', ').trim() + '.');
+                    throw new Error('Email can not be in one of the following domains: ' + constants.RESTRICTED_EMAILS.join(', ').trim() + '.');
                 }
             }
         },
