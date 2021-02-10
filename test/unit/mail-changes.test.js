@@ -52,7 +52,7 @@ describe('Mail changes', () => {
         }
     });
 
-    test('should fail with not valid email (aegee.eu)', async () => {
+    test('should fail with invalid new_email (aegee.eu)', async () => {
         try {
             const user = await generator.createUser();
             await generator.createMailChange({ new_email: 'test@aegee.eu' }, user);
@@ -64,7 +64,7 @@ describe('Mail changes', () => {
         }
     });
 
-    test('should fail with not valid email (aegee.org)', async () => {
+    test('should fail with invalid new_email (aegee.org)', async () => {
         try {
             const user = await generator.createUser();
             await generator.createMailChange({ new_email: 'test@aegee.org' }, user);
