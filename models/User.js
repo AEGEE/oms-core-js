@@ -7,8 +7,6 @@ const config = require('../config');
 
 const NAME_REGEX = new RegExp('^[\\p{L}. \\-\']*$', 'u');
 const USERNAME_REGEX = new RegExp('^[a-zA-Z0-9._-]*$');
-// eslint-disable-next-line no-useless-escape
-const EMAIL_REGEX = new RegExp('\@(' + constants.RESTRICTED_EMAILS.join('|').trim() + ')');
 
 const User = sequelize.define('user', {
     username: {
@@ -33,7 +31,7 @@ const User = sequelize.define('user', {
             notNull: { msg: 'Email should be set.' },
             isEmail: { msg: 'Email should be valid.' },
             isValid(value) {
-                if (EMAIL_REGEX.test(value)) {
+                if (constants.RESTRICTED_EMAILS.some((email) => value.includes(email))) {
                     throw new Error('Email can not be in one of the following domains: ' + constants.RESTRICTED_EMAILS.join(', ').trim() + '.');
                 }
             }

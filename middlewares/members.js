@@ -161,9 +161,7 @@ exports.triggerEmailChange = async (req, res) => {
         return errors.makeBadRequestError(res, 'No new email is provided.');
     }
 
-    // eslint-disable-next-line no-useless-escape
-    const EMAIL_REGEX = new RegExp('\@(' + constants.RESTRICTED_EMAILS.join('|').trim() + ')');
-    if (EMAIL_REGEX.test(req.body.new_email)) {
+    if (constants.RESTRICTED_EMAILS.some((email) => req.body.new_email.includes(email))) {
         return errors.makeValidationError(res, 'Your email can not be in one of the following domains: ' + constants.RESTRICTED_EMAILS.join(', ').trim() + '.');
     }
 
