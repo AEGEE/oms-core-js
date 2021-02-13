@@ -90,6 +90,25 @@ describe('User details', () => {
         expect(res.body.data.id).toEqual(user.id);
     });
 
+    test('should find the user with view_member', async () => {
+        const user = await generator.createUser({ superadmin: true });
+        const token = await generator.createAccessToken({}, user);
+
+        await generator.createPermission({ scope: 'global', action: 'view_member', object: 'body' });
+
+        const res = await request({
+            uri: '/members/' + user.id,
+            method: 'GET',
+            headers: { 'X-Auth-Token': token.value }
+        });
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body).toHaveProperty('data');
+        expect(res.body).not.toHaveProperty('errors');
+        expect(res.body.data.id).toEqual(user.id);
+    });
+
     test('work for the current user for /me without permission', async () => {
         const user = await generator.createUser();
         const token = await generator.createAccessToken({}, user);
