@@ -25,6 +25,25 @@ exports.listAllUsers = async (req, res) => {
     });
 };
 
+exports.searchAllUsers = async (req, res) => {
+    if (!req.permissions.hasPermission('global:search:member')) {
+        return errors.makeForbiddenError(res, 'Permission global:search:member is required, but not present.');
+    }
+
+    const result = await User.findAndCountAll({
+        where: helpers.filterBy(req.query.query, constants.FIELDS_TO_QUERY.MEMBER),
+        ...helpers.getPagination(req.query),
+        attributes: ['id', 'first_name', 'last_name', 'username', 'email', 'gsuite_id'],
+        order: helpers.getSorting(req.query)
+    });
+
+    return res.json({
+        success: true,
+        data: result.rows,
+        meta: { count: result.count }
+    });
+};
+
 exports.listAllUnconfirmedUsers = async (req, res) => {
     if (!req.permissions.hasPermission('global:view_unconfirmed:member')) {
         return errors.makeForbiddenError(res, 'Permission global:view_unconfirmed:member is required, but not present.');
@@ -66,6 +85,23 @@ exports.getUser = async (req, res) => {
     return res.json({
         success: true,
         data: req.currentUser
+    });
+};
+
+exports.getUsersEmail = async (req, res) => {
+    if (!req.permissions.hasPermission('global:mail:member')) {
+        return errors.makeForbiddenError(res, 'Permission global:mail:member is required, but not present.');
+    }
+
+    const result = await User.findAndCountAll({
+        where: { id: { [Sequelize.Op.or]: req.query.query.split(',') } },
+        attributes: ['id', 'email', 'gsuite_id', 'primary_email', 'notification_email']
+    });
+
+    return res.json({
+        success: true,
+        data: result.rows, // TODO: only return id and notification_email
+        meta: { count: result.count }
     });
 };
 
