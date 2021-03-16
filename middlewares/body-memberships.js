@@ -106,9 +106,29 @@ exports.createMembership = async (req, res) => {
         return errors.makeNotFoundError(res, 'User is not found');
     }
 
-    const membership = await BodyMembership.create({
+    let membership;
+
+    await sequelize.transaction(async (t) => {
+      const body_count = await BodyMembership.count({ where: { user_id: user.id } })
+      membership = await BodyMembership.create({
         body_id: req.currentBody.id,
-        user_id: user.id
+        user_id: user.id,
+        t
+      });
+
+      if (body_count === 0) {
+        await mailer.sendMail({
+            to: req.body.email,
+            subject: constants.MAIL_SUBJECTS.NEW_MEMBER,
+            template: 'new_member.html',
+            parameters: {
+              member_firstname: user.first_name,
+              member_lastname: user.last_name,
+              body_name: req.currentBody.name,
+              body_id: req.currentBody.id
+            }
+        });
+      }
     });
 
     return res.json({
