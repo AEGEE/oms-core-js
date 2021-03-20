@@ -1,4 +1,5 @@
 const moment = require('moment');
+const _ = require('lodash');
 
 const { User, Body, MailChange } = require('../models');
 const constants = require('../lib/constants');
@@ -110,7 +111,7 @@ exports.getUsersEmail = async (req, res) => {
 
     return res.json({
         success: true,
-        data: result.rows, // TODO: only return id and notification_email
+        data: result.rows.map((row) => _.pick(row, ['id', 'notification_email'])),
         meta: { count: result.count }
     });
 };
