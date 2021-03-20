@@ -75,41 +75,6 @@ async function findMyAEGEEuser(obj) {
 
 gsuite_obj.forEach( findMyAEGEEuser )
 
-//PART 3: now look at groups
-//to be implemented (circles are hard, and gsuite matches circle<->group arent mapped yet)
-function putInGsuiteGroups(obj) {
-  return "wip"
-
-  /* For each circle which has a gsuite_id field set,
-   * take a list of members.
-   * For each member, execute API call.
-   *
-   *
-   * Blocked by policy (about people 'consenting' to receive mandatory email)
-   */
-
-  if(obj.allocated){
-
-    const result = core.query(obj.recoveryEmail).bodies
-    const users = await User.findAll({// FIXME or bodies?
-      where: { gsuite_id: obj.primaryEmail }
-    });
-
-    if(users){
-      for (const grp of result.gsuite_id) { //FIXME there must already be a mapping in core between body and gsuite
-        const data = {
-          "primaryEmail": obj.primaryEmail,
-          "group": grp
-        }
-        runGsuiteOperation(gsuiteOperations.addUserInGroup, data);
-        sleep(2) ; //rate limiting
-      }
-    }
-  }
-}
-
-//gsuite_obj.forEach( putInGsuiteGroups )
-
 // HERE is the part where we do the MANUAL PATCH
 console.log("")
 console.log("")
@@ -165,54 +130,6 @@ console.log("harder guess total: ", gsuite_obj.filter(obj => obj.m_possible_user
 console.log("")
 console.log("")
 
-
-//LAST PART: create gsuite account for all members in MyAEGEE
-// THIS PART NEEDS TO BE LAUNCHED AFTER THE MANUAL PATCH
-const users = async function () {
-  return await User.findAll({
-    where: { gsuite_id: null }
-  });
-}();
-
-const creationErrors = [];
-
-async function createOneForThesePoorGuys(user) {
-  try{
-    console.log(`User ${user.email}, creating an account`);
-
-    const regex = / /g;
-    const username = (user.first_name+"."+user.last_name).replace(regex, ''); // FIXME also careful of ü ö etc
-    const res = await superagent.get('gsuite-wrapper:8084/accounts?q='+username); //check collision
-
-    if (!res.body.data.users){ // then there's no collision and i can post
-
-      const payload = {
-        "name": {
-          "givenName": user.first_name,
-          "familyName": user.last_name
-        },
-        "primaryEmail": username+"@aegee.eu",
-        "secondaryEmail": user.email,
-        "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
-        "antenna": user.primaryBody
-      }
-
-      const creation = await superagent.post('gsuite-wrapper:8084/accounts', payload)
-      if (!creation.body.success){
-        creationErrors.push(creation.body);
-      }
-      sleep(2) ; //rate limiting
-    }
-  }catch(e){
-    console.log(e)
-  }
-}
-
-users.forEach( createOneForThesePoorGuys );
-
-// another manual check about creationErrors
-console.log("There were "+creationErrors.length+" creation errors")
-console.log(creationErrors)
 
 //TODO last but not least: create a final check that says "this gsuite user does not have an equivalent in myaegee"
 // the above is a nice to have. Basically the dream script is as below
