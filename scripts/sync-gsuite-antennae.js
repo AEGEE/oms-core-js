@@ -1,6 +1,10 @@
 /* eslint-disable */
 // PART 1: get all gsuite under /antennae, and for each one make a query to core
 
+const {
+  User
+} = require('../models');
+
 const gsuite_obj = [
   // {
   //   "primaryEmail": aegee-place@aegee.eu, // from gsuite
@@ -12,9 +16,7 @@ const gsuite_obj = [
 const request = require('request-promise-native');
 
 (async () => {
-
   try{
-
     const antennae = JSON.parse(await request({"method": "GET", "url": 'http://gsuite-wrapper:8084/account?max=500&q=orgUnitPath=/antennae'}));
 
     let unrecovery=0
@@ -38,7 +40,7 @@ const request = require('request-promise-native');
   }catch (e){
     console.log(e)
   }
-})();
+})().then(async() => {
 
 async function findMyAEGEEantenna(obj) {
 
@@ -75,6 +77,11 @@ console.log("")
 console.log("Total number of unallocated objects:")
 console.log(gsuite_obj.filter(obj => obj.allocated===false).length)
 
+
+}).catch((err) => {
+  console.log(`christ sake: ${err}`);
+  process.exit(1);
+});
 
 //TODO last but not least: create a final check that says "this gsuite user does not have an equivalent in myaegee"
 // the above is a nice to have. Basically the dream script is as below
