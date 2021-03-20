@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 // PART 1: get all gsuite under /individuals, and for each one make a query to core
 
 const gsuite_obj = [
@@ -13,19 +13,17 @@ const gsuite_obj = [
 
 //GAM tells me there are 800-900 users, so we need two invocations.
 
-const superagent = require('superagent');
+const request = require('request-promise-native');
 
 (async () => {
+  try {
+    const part1 = JSON.parse(await request({"method": "GET", "url": 'http://gsuite-wrapper:8084/account?max=500'}));
 
-  try{
-
-    const part1 = await superagent.get('gsuite-wrapper:8084/accounts?max=500')
-
-    const part2 = await superagent.get('gsuite-wrapper:8084/accounts?max=500&pageToken='+part1.body.data.nextPageToken)
+    const part2 = JSON.parse(await request({"method": "GET", "url": 'http://gsuite-wrapper:8084/account?max=500&pageToken=' + part1.data.nextPageToken}));
 
     let unrecovery=0
 
-    part1.body.data.users.concat(part2.body.data.users).forEach( (item) => {
+    part1.data.users.concat(part2.data.users).forEach( (item) => {
       gsuite_obj.push(
       {
         "primaryEmail": item.primaryEmail,

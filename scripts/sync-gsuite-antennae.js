@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 // PART 1: get all gsuite under /antennae, and for each one make a query to core
 
 const gsuite_obj = [
@@ -9,17 +9,17 @@ const gsuite_obj = [
   // } ;
 ];
 
-const superagent = require('superagent');
+const request = require('request-promise-native');
 
 (async () => {
 
   try{
 
-    const antennae = await superagent.get('gsuite-wrapper:8084/accounts?max=500&q=orgUnitPath=/antennae')
+    const antennae = JSON.parse(await request({"method": "GET", "url": 'http://gsuite-wrapper:8084/account?max=500&q=orgUnitPath=/antennae'}));
 
     let unrecovery=0
 
-    antennae.body.data.users.forEach( (item) => {
+    antennae.data.users.forEach( (item) => {
       gsuite_obj.push(
       {
         "primaryEmail": item.primaryEmail,
