@@ -1,6 +1,10 @@
 /* eslint-disable */
 // PART 1: get all gsuite under /individuals, and for each one make a query to core
 
+const {
+  User
+} = require('../models');
+
 const gsuite_obj = [
   // {
   //   "primaryEmail": name.surname@aegee.eu, // from gsuite
@@ -44,7 +48,7 @@ const request = require('request-promise-native');
   }catch (e){
     console.log(e)
   }
-})();
+})().then(async() => {
 
 async function findMyAEGEEuser(obj) {
 
@@ -128,6 +132,11 @@ console.log("harder guess total: ", gsuite_obj.filter(obj => obj.m_possible_user
 console.log("")
 console.log("")
 
+
+}).catch((err) => {
+  console.log(`christ sake: ${err}`);
+  process.exit(1);
+});
 
 //TODO last but not least: create a final check that says "this gsuite user does not have an equivalent in myaegee"
 // the above is a nice to have. Basically the dream script is as below
