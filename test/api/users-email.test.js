@@ -114,29 +114,29 @@ describe('Users list', () => {
         expect(res.body).not.toHaveProperty('data');
     });
 
-    // test('should only return id and notification email', async () => {
-    //     const user = await generator.createUser({ superadmin: true });
-    //     const token = await generator.createAccessToken({}, user);
+    test('should only return id and notification email', async () => {
+        const user = await generator.createUser({ superadmin: true });
+        const token = await generator.createAccessToken({}, user);
 
-    //     await generator.createPermission({ scope: 'global', action: 'mail', object: 'member' });
+        await generator.createPermission({ scope: 'global', action: 'mail', object: 'member' });
 
-    //     const res = await request({
-    //         uri: '/members_email',
-    //         method: 'GET',
-    //         headers: { 'X-Auth-Token': token.value }
-    //     });
+        const res = await request({
+            uri: '/members_email',
+            method: 'GET',
+            headers: { 'X-Auth-Token': token.value }
+        });
 
-    //     const expectedOutput = {
-    //         id: user.id,
-    //         notification_email: user.notification_email
-    //     }
+        const expectedOutput = {
+            id: user.id,
+            notification_email: user.notification_email
+        };
 
-    //     expect(res.statusCode).toEqual(200);
-    //     expect(res.body.success).toEqual(true);
-    //     expect(res.body).toHaveProperty('data');
-    //     expect(res.body).not.toHaveProperty('errors');
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body).toHaveProperty('data');
+        expect(res.body).not.toHaveProperty('errors');
 
-    //     expect(res.body.data.length).toEqual(1);
-    //     expect(res.body.data[0]).toEqual(expectedOutput);
-    // });
+        expect(res.body.data.length).toEqual(1);
+        expect(res.body.data[0]).toEqual(expectedOutput);
+    });
 });
