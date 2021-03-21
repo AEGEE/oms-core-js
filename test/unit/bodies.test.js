@@ -41,11 +41,19 @@ describe('Bodies testing', () => {
         }
     });
 
-    test('should work with email not set', async () => {
-        const data = generator.generateBody({ email: null });
-        const body = await Body.create(data);
+    test('should fail with email not set', async () => {
+        try {
+            const body = generator.generateBody();
+            delete body.email;
 
-        expect(body.email).toEqual(null);
+            await Body.create(body);
+
+            expect(1).toEqual(0);
+        } catch (err) {
+            expect(err).toHaveProperty('errors');
+            expect(err.errors.length).toEqual(1);
+            expect(err.errors[0].path).toEqual('email');
+        }
     });
 
     test('should normalize fields', async () => {
