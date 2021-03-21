@@ -64,7 +64,7 @@ describe('Campaign details', () => {
         });
 
         expect(res.statusCode).toEqual(200);
-        expect(res.body.success).toEqual(false);
+        expect(res.body.success).toEqual(true);
         expect(res.body).toHaveProperty('data');
         expect(res.body.data).not.toHaveProperty('autojoin_body_id');
     });
@@ -90,7 +90,7 @@ describe('Campaign details', () => {
         expect(res.body.data.id).toEqual(campaign.id);
     });
 
-    test('should find the campaign by name', async () => {
+    test('should find the campaign by url', async () => {
         const user = await generator.createUser({ superadmin: true });
         const token = await generator.createAccessToken({}, user);
 
@@ -99,7 +99,7 @@ describe('Campaign details', () => {
         const campaign = await generator.createCampaign();
 
         const res = await request({
-            uri: '/campaigns/' + campaign.name,
+            uri: '/campaigns/' + campaign.url,
             method: 'GET',
             headers: { 'X-Auth-Token': token.value }
         });
@@ -108,6 +108,6 @@ describe('Campaign details', () => {
         expect(res.body.success).toEqual(true);
         expect(res.body).toHaveProperty('data');
         expect(res.body).not.toHaveProperty('errors');
-        expect(res.body.data.name).toEqual(campaign.name);
+        expect(res.body.data.url).toEqual(campaign.url);
     });
 });
