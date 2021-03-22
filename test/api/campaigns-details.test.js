@@ -69,6 +69,27 @@ describe('Campaign details', () => {
         expect(res.body.data).not.toHaveProperty('autojoin_body_id');
     });
 
+    test('should return some info about the autojoin_body', async () => {
+        const user = await generator.createUser();
+        const token = await generator.createAccessToken({}, user);
+
+        const body = await generator.createBody();
+        const campaign = await generator.createCampaign({ autojoin_body_id: body.id });
+
+        const res = await request({
+            uri: '/campaigns/' + campaign.id,
+            method: 'GET',
+            headers: { 'X-Auth-Token': token.value }
+        });
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body).toHaveProperty('data');
+        expect(res.body.data).toHaveProperty('autojoin_body');
+        expect(res.body.data.autojoin_body).toHaveProperty('email');
+        expect(res.body.data.autojoin_body).not.toHaveProperty('founded_at');
+    });
+
     test('should find the campaign by id', async () => {
         const user = await generator.createUser({ superadmin: true });
         const token = await generator.createAccessToken({}, user);
