@@ -2,6 +2,7 @@ const { startServer, stopServer } = require('../../lib/server.js');
 const { request } = require('../scripts/helpers');
 const generator = require('../scripts/generator');
 const { JoinRequest, BodyMembership, CircleMembership } = require('../../models');
+const mock = require('../scripts/mock');
 
 describe('Join request status', () => {
     beforeAll(async () => {
@@ -12,8 +13,13 @@ describe('Join request status', () => {
         await stopServer();
     });
 
+    beforeEach(async () => {
+        await mock.mockAll();
+    });
+
     afterEach(async () => {
         await generator.clearAll();
+        await mock.cleanAll();
     });
 
     test('should return 400 if the request_id is invalid', async () => {
@@ -145,6 +151,8 @@ describe('Join request status', () => {
             body: { status: 'approved' }
         });
 
+        console.log(res.body);
+
         expect(res.statusCode).toEqual(200);
         expect(res.body.success).toEqual(true);
         expect(res.body).not.toHaveProperty('errors');
@@ -211,6 +219,8 @@ describe('Join request status', () => {
             headers: { 'X-Auth-Token': token.value },
             body: { status: 'approved' }
         });
+
+        console.log(res.body);
 
         expect(res.statusCode).toEqual(200);
         expect(res.body.success).toEqual(true);
