@@ -6,7 +6,8 @@ const {
     User
 } = require('../models');
 const helpers = require('../lib/helpers');
-const { Sequelize } = require('../lib/sequelize');
+const { sequelize, Sequelize } = require('../lib/sequelize');
+const mailer = require('../lib/mailer');
 const constants = require('../lib/constants');
 const errors = require('../lib/errors');
 
@@ -109,26 +110,26 @@ exports.createMembership = async (req, res) => {
     let membership;
 
     await sequelize.transaction(async (t) => {
-      const body_count = await BodyMembership.count({ where: { user_id: user.id } })
-      membership = await BodyMembership.create({
-        body_id: req.currentBody.id,
-        user_id: user.id,
-        t
-      });
+        const bodyCount = await BodyMembership.count({ where: { user_id: user.id } });
 
-      if (body_count === 0) {
-        await mailer.sendMail({
-            to: req.body.email,
-            subject: constants.MAIL_SUBJECTS.NEW_MEMBER,
-            template: 'new_member.html',
-            parameters: {
-              member_firstname: user.first_name,
-              member_lastname: user.last_name,
-              body_name: req.currentBody.name,
-              body_id: req.currentBody.id
-            }
-        });
-      }
+        membership = await BodyMembership.create({
+            user_id: user.id,
+            body_id: req.currentBody.id
+        }, { transaction: t });
+
+        if (bodyCount === 0) {
+            await mailer.sendMail({
+                to: user.notification_email,
+                subject: constants.MAIL_SUBJECTS.NEW_MEMBER,
+                template: 'new_member.html',
+                parameters: {
+                    member_firstname: user.first_name,
+                    member_lastname: user.last_name,
+                    body_name: req.currentBody.name,
+                    body_id: req.currentBody.id
+                }
+            });
+        }
     });
 
     return res.json({
