@@ -151,8 +151,6 @@ describe('Join request status', () => {
             body: { status: 'approved' }
         });
 
-        console.log(res.body);
-
         expect(res.statusCode).toEqual(200);
         expect(res.body.success).toEqual(true);
         expect(res.body).not.toHaveProperty('errors');
@@ -219,8 +217,6 @@ describe('Join request status', () => {
             headers: { 'X-Auth-Token': token.value },
             body: { status: 'approved' }
         });
-
-        console.log(res.body);
 
         expect(res.statusCode).toEqual(200);
         expect(res.body.success).toEqual(true);
