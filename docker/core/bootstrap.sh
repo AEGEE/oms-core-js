@@ -5,3 +5,5 @@ echo "Migrating database..."
 npm run db:migrate
 echo "Seeding database..."
 npm run db:seed
+
+sh -c "${@}"
