@@ -117,8 +117,7 @@ describe('User mail change', () => {
         expect(res.statusCode).toEqual(422);
         expect(res.body.success).toEqual(false);
         expect(res.body).not.toHaveProperty('data');
-        expect(res.body).toHaveProperty('errors');
-        expect(res.body.errors).toHaveProperty('new_email');
+        expect(res.body).toHaveProperty('message');
     });
 
     test('should fail if new mail in in @aegee.org', async () => {
@@ -137,8 +136,7 @@ describe('User mail change', () => {
         expect(res.statusCode).toEqual(422);
         expect(res.body.success).toEqual(false);
         expect(res.body).not.toHaveProperty('data');
-        expect(res.body).toHaveProperty('errors');
-        expect(res.body.errors).toHaveProperty('new_email');
+        expect(res.body).toHaveProperty('message');
     });
 
     test('should fail if mailer fails', async () => {
