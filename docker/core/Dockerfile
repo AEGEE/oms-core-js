@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:16
 
 RUN mkdir -p /usr/app/src \
 	&& mkdir -p /usr/app/media \
