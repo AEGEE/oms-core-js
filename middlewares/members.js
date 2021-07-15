@@ -1,6 +1,8 @@
 const moment = require('moment');
 const _ = require('lodash');
 
+const superagent = require('superagent');
+const crypto = require('crypto');
 const { User, Body, MailChange, MailConfirmation } = require('../models');
 const constants = require('../lib/constants');
 const helpers = require('../lib/helpers');
@@ -122,6 +124,18 @@ exports.updateUser = async (req, res) => {
     }
 
     await req.currentUser.update(req.body, { fields: constants.FIELDS_TO_UPDATE.USER.UPDATE });
+
+    // TODO: update first/late name to GSuite account (if there is an account attached)
+    if (req.currentUser.gsuite_id && (req.body.first_name || req.body.last_name)) {
+        const payload = {
+            name: {
+                givenName: req.body.first_name || req.currentUser.first_name,
+                familyName: req.body.last_name || req.currentUser.last_name
+            }
+        };
+        await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, payload);
+    }
+
     return res.json({
         success: true,
         data: req.currentUser
@@ -133,7 +147,13 @@ exports.deleteUser = async (req, res) => {
         return errors.makeForbiddenError(res, 'Permission delete:member is required, but not present.');
     }
 
+    // TODO: if user gets deleted the gsuite account also gets deleted (if there was an account attached)
+    if (req.currentUser.gsuite_id) {
+        await superagent.delete('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id);
+    }
+
     await req.currentUser.destroy();
+
     return res.json({
         success: true,
         message: 'User is deleted.'
@@ -153,6 +173,14 @@ exports.setUserPassword = async (req, res) => {
 
     await userWithPassword.update({ password: req.body.password });
 
+    // TODO: password should be sent to gsuite-wrapper
+    if (req.currentUser.gsuite_id) {
+        const payload = {
+            password: crypto.createHash('sha1').update(JSON.stringify(req.body.password)).digest('hex')
+        };
+        await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, payload);
+    }
+
     // TODO: add a mail that the password was changed.
 
     return res.json({
@@ -167,6 +195,7 @@ exports.setUserActive = async (req, res) => {
     }
 
     await req.currentUser.update({ active: req.body.active });
+
     return res.json({
         success: true,
         data: req.currentUser
@@ -185,6 +214,11 @@ exports.confirmUser = async (req, res) => {
     });
 
     await confirmation.destroy();
+
+    // TODO: probably move this to another method since not all MyAEGEE members should have a GSuite account
+    if (req.currentUser.gsuite_id) {
+        await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, { suspended: false });
+    }
 
     return res.json({
         success: true,
@@ -207,9 +241,15 @@ exports.setPrimaryBody = async (req, res) => {
             return errors.makeForbiddenError(res, 'User is not a member of this body.');
         }
 
+        // TODO: set GSuite department to primary body
         await req.currentUser.update({ primary_body_id: body.id });
+        // await superagent.post('gsuite-wrapper:8084/accounts?DEPARTMENT')
+        // await superagent.post('gsuite-wrapper:8084/groups?DEPARTMENT')
     } else {
+        // TODO: set GSuite department to primary body
         await req.currentUser.update({ primary_body_id: null });
+        // await superagent.post('gsuite-wrapper:8084/accounts?DEPARTMENT')
+        // await superagent.post('gsuite-wrapper:8084/groups?DEPARTMENT')
     }
 
     return res.json({
@@ -276,9 +316,13 @@ exports.confirmEmailChange = async (req, res) => {
         return errors.makeNotFoundError(res, 'Token is expired.');
     }
 
+    // TODO: change GSuite secondary email
     await sequelize.transaction(async (t) => {
         await mailChange.user.update({ email: mailChange.new_email }, { transaction: t });
         await mailChange.destroy({ transaction: t });
+        if (req.currentUser.gsuite_id) {
+            await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, { secondaryEmail: mailChange.new_email });
+        }
     });
 
     return res.json({

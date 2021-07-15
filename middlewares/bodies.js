@@ -52,6 +52,8 @@ exports.createBody = async (req, res) => {
         return errors.makeForbiddenError(res, 'Permission global:create:body is required, but not present.');
     }
 
+    // TODO: if antenna, contact antenna or contact, then create GSuite account
+
     // TODO: filter out fields that are changed in the other way
     const body = await Body.create(req.body);
     return res.json({
@@ -64,6 +66,8 @@ exports.updateBody = async (req, res) => {
     if (!req.permissions.hasPermission('update:body')) {
         return errors.makeForbiddenError(res, 'Permission update:body is required, but not present.');
     }
+
+    // TODO: if antenna, contact antenna or contact, then update GSuite account if needed
 
     await req.currentBody.update(req.body, { fields: req.permissions.getPermissionFilters('update:body') });
     return res.json({
@@ -89,6 +93,7 @@ exports.setBodyStatus = async (req, res) => {
         await BodyMembership.destroy({ where: { body_id: req.currentBody.id }, transaction: t });
         await Circle.destroy({ where: { body_id: req.currentBody.id }, transaction: t });
         await Payment.destroy({ where: { body_id: req.currentBody.id }, transaction: t });
+        // TODO: suspend GSuite account (if attached)
     });
 
     return res.json({
@@ -122,6 +127,7 @@ exports.createMember = async (req, res) => {
         body_id: req.currentBody.id
     });
 
+    // TODO: create active GSuite account
     return res.json({
         success: true,
         data: membership

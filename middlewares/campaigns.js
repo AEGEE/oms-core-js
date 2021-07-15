@@ -1,3 +1,5 @@
+const superagent = require('superagent');
+const crypto = require('crypto');
 const {
     User,
     MailConfirmation,
@@ -33,13 +35,32 @@ exports.registerUser = async (req, res) => {
             transaction: t
         });
 
+        // TODO: add uniqueness check; transliterate gsuiteEmail in case of umlauts or other special characters
+        // TODO: probably move this elsewhere since not all MyAEGEE users need a GSuite account
+        const gsuiteEmail = req.body.first_name + '.' + req.body.last_name + '@' + constants.GSUITE_DOMAIN;
+        const payload = {
+            primaryEmail: gsuiteEmail.toLowerCase().replace(' ', ''),
+            name: {
+                givenName: req.body.first_name,
+                familyName: req.body.last_name
+            },
+            secondaryEmail: req.body.email,
+            password: crypto.createHash('sha1').update(JSON.stringify(req.body.password)).digest('hex'),
+            userPK: req.body.username,
+            antenna: 'Undefined-yet'
+        };
+
         // Adding a person to a body if campaign has the autojoin body.
         if (campaign.autojoin_body_id) {
             await BodyMembership.create({
                 user_id: user.id,
                 body_id: campaign.autojoin_body_id
             }, { transaction: t });
+
+            payload.antenna = campaign.autojoin_body_id;
         }
+
+        await superagent.post('gsuite-wrapper:8084/accounts', payload);
 
         const confirmation = await MailConfirmation.createForUser(user.id, t);
 
