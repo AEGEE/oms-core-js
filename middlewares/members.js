@@ -2,6 +2,7 @@ const moment = require('moment');
 const _ = require('lodash');
 
 const superagent = require('superagent');
+const crypto = require('crypto');
 const { User, Body, MailChange, MailConfirmation } = require('../models');
 const constants = require('../lib/constants');
 const helpers = require('../lib/helpers');
@@ -125,7 +126,7 @@ exports.updateUser = async (req, res) => {
     await req.currentUser.update(req.body, { fields: constants.FIELDS_TO_UPDATE.USER.UPDATE });
 
     // TODO: update first/late name to GSuite account (if there is an account attached)
-    if (req.body.first_name || req.body.last_name) {
+    if (req.currentUser.gsuite_id && (req.body.first_name || req.body.last_name)) {
         const payload = {
             name: {
                 givenName: req.body.first_name || req.currentUser.first_name,
@@ -147,8 +148,12 @@ exports.deleteUser = async (req, res) => {
     }
 
     // TODO: if user gets deleted the gsuite account also gets deleted (if there was an account attached)
-    await superagent.delete('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id);
+    if (req.currentUser.gsuite_id) {
+        await superagent.delete('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id);
+    }
+
     await req.currentUser.destroy();
+
     return res.json({
         success: true,
         message: 'User is deleted.'
@@ -167,8 +172,14 @@ exports.setUserPassword = async (req, res) => {
     }
 
     await userWithPassword.update({ password: req.body.password });
+
     // TODO: password should be sent to gsuite-wrapper
-    // await superagent.post('gsuite-wrapper:8084/accounts?SETPASS')
+    if (req.currentUser.gsuite_id) {
+        const payload = {
+            password: crypto.createHash('sha1').update(JSON.stringify(req.body.password)).digest('hex')
+        };
+        await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, payload);
+    }
 
     // TODO: add a mail that the password was changed.
 
@@ -204,7 +215,10 @@ exports.confirmUser = async (req, res) => {
 
     await confirmation.destroy();
 
-    await superagent.put('gsuite-wrapper:8084/accounts/'+req.currentUser.gsuite_id, { 'suspended': false } );
+    // TODO: probably move this to another method since not all MyAEGEE members should have a GSuite account
+    if (req.currentUser.gsuite_id) {
+        await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, { suspended: false });
+    }
 
     return res.json({
         success: true,
@@ -306,7 +320,9 @@ exports.confirmEmailChange = async (req, res) => {
     await sequelize.transaction(async (t) => {
         await mailChange.user.update({ email: mailChange.new_email }, { transaction: t });
         await mailChange.destroy({ transaction: t });
-        await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, { secondaryEmail: mailChange.new_email });
+        if (req.currentUser.gsuite_id) {
+            await superagent.put('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id, { secondaryEmail: mailChange.new_email });
+        }
     });
 
     return res.json({

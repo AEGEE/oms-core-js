@@ -36,6 +36,7 @@ exports.registerUser = async (req, res) => {
         });
 
         // TODO: add uniqueness check; transliterate gsuiteEmail in case of umlauts or other special characters
+        // TODO: probably move this elsewhere since not all MyAEGEE users need a GSuite account
         const gsuiteEmail = req.body.first_name + '.' + req.body.last_name + '@' + constants.GSUITE_DOMAIN;
         const payload = {
             primaryEmail: gsuiteEmail.toLowerCase().replace(' ', ''),
