@@ -145,6 +145,7 @@ exports.deleteUser = async (req, res) => {
     if (!req.permissions.hasPermission('delete:member')) {
         return errors.makeForbiddenError(res, 'Permission delete:member is required, but not present.');
     }
+
     // TODO: if user gets deleted the gsuite account also gets deleted (if there was an account attached)
     await superagent.delete('gsuite-wrapper:8084/accounts/' + req.currentUser.gsuite_id);
     await req.currentUser.destroy();
