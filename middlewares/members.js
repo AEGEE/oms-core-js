@@ -1,6 +1,7 @@
 const moment = require('moment');
 const _ = require('lodash');
 
+const superagent = require('superagent');
 const { User, Body, MailChange, MailConfirmation } = require('../models');
 const constants = require('../lib/constants');
 const helpers = require('../lib/helpers');
